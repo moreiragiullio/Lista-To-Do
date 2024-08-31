@@ -28,14 +28,14 @@
         }
     };
     var Reminder = /** @class */ (function () {
-        function Reminder(descripiton, date, notifications) {
+        function Reminder(description, date, notifications) {
             this.id = UUID();
             this.dateCreated = DatesUtils.today();
             this.dateUpdated = DatesUtils.today();
             this.description = '';
             this.date = DatesUtils.tomorrow();
             this.notifications = [NotificationPlatform.EMAIL];
-            this.description = descripiton;
+            this.description = description;
             this.date = date;
             this.notifications = notifications;
         }

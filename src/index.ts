@@ -42,11 +42,11 @@
       notifications: Array<NotificationPlatform> = [NotificationPlatform.EMAIL]
 
       constructor(
-        descripiton: string,
+        description: string,
         date: Date,
         notifications: Array<NotificationPlatform>
       ){
-        this.description = descripiton;
+        this.description = description;
         this.date = date;
         this.notifications = notifications;
       }      
