@@ -161,7 +161,7 @@
                 break;
                 case ViewMode.REMINDER:
                     mode = ViewMode.TODO
-                    break;
+                    break
         }
         view.render(tasks, mode);
     }
