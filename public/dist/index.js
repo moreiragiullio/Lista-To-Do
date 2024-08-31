@@ -1,4 +1,5 @@
 "use strict";
+// IIFE to preserve code scope
 (function () {
     var NotificationPlatform;
     (function (NotificationPlatform) {
@@ -6,15 +7,12 @@
         NotificationPlatform["EMAIL"] = "EMAIL";
         NotificationPlatform["PUSH_NOTIFICATION"] = "PUSH_NOTIFICATION";
     })(NotificationPlatform || (NotificationPlatform = {}));
-    var ViewMode;
-    (function (ViewMode) {
-        ViewMode["TODO"] = "TODO";
-        ViewMode["REMINDER"] = "REMINDER";
-    })(ViewMode || (ViewMode = {}));
-    var UUID = function () {
-        return Math.random().toString(32).substr(2, 9);
-    };
-    var DatesUtils = {
+    var Mode;
+    (function (Mode) {
+        Mode["TODO"] = "TODO";
+        Mode["REMINDER"] = "REMINDER";
+    })(Mode || (Mode = {}));
+    var DateUtils = {
         tomorrow: function () {
             var tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -24,43 +22,44 @@
             return new Date();
         },
         formatDate: function (date) {
-            return "".concat(date.getDate(), ".").concat(date.getMonth() + 1, ". ").concat(date.getFullYear());
-        }
+            return "".concat(date.getDate(), ".").concat(date.getMonth() + 1, ".").concat(date.getFullYear());
+        },
+    };
+    var UUID = function () {
+        return Math.random().toString(36).substr(2, 9);
     };
     var Reminder = /** @class */ (function () {
-        function Reminder(description, date, notifications) {
+        function Reminder(description, scheduleDate, notifications) {
             this.id = UUID();
-            this.dateCreated = DatesUtils.today();
-            this.dateUpdated = DatesUtils.today();
-            this.description = '';
-            this.date = DatesUtils.tomorrow();
+            this.dateCreated = DateUtils.today();
+            this.dateUpdated = DateUtils.today();
+            this.description = "";
+            this.scheduleDate = DateUtils.tomorrow();
             this.notifications = [NotificationPlatform.EMAIL];
             this.description = description;
-            this.date = date;
+            this.scheduleDate = scheduleDate;
             this.notifications = notifications;
         }
         Reminder.prototype.render = function () {
-            return "\n          ---> Reminder <---\n          description: ".concat(this.description, "\n          date: ").concat(DatesUtils.formatDate(this.date), "\n          platform: ").concat(this.notifications.join(','), "\n          ");
+            return "\n        ---> Reminder <--- \n\n        Description: ".concat(this.description, " \n\n        Notify by ").concat(this.notifications.join(" and "), " in ").concat(DateUtils.formatDate(this.scheduleDate), " \n\n        Created: ").concat(DateUtils.formatDate(this.dateCreated), " Last Update: ").concat(DateUtils.formatDate(this.dateUpdated), "\n        ");
         };
         return Reminder;
     }());
     var Todo = /** @class */ (function () {
         function Todo(description) {
             this.id = UUID();
-            this.dateCreated = DatesUtils.today();
-            this.dateUpdated = DatesUtils.today();
-            this.description = '';
+            this.dateCreated = DateUtils.today();
+            this.dateUpdated = DateUtils.today();
+            this.description = "";
             this.done = false;
             this.description = description;
         }
         Todo.prototype.render = function () {
-            return "\n            ---> TODO <----\n            description: ".concat(this.description, "\n            done: ").concat(this.done, "\n            ");
+            var doneLabel = this.done ? "Completed" : "In Progress";
+            return "\n        ---> TODO <--- \n\n        Description: ".concat(this.description, " \n\n        Status: ").concat(doneLabel, " \n\n        Created: ").concat(DateUtils.formatDate(this.dateCreated), " Last Update: ").concat(DateUtils.formatDate(this.dateUpdated), "\n        ");
         };
         return Todo;
     }());
-    var todo = new Todo('Todo criado com a Classe');
-    var reminder = new Reminder('Reminder criado com a Classe', new Date(), [NotificationPlatform.EMAIL,
-    ]);
     var taskView = {
         getTodo: function (form) {
             var todoDescription = form.todoDescription.value;
@@ -69,9 +68,9 @@
         },
         getReminder: function (form) {
             var reminderNotifications = [
-                form.notifications.value,
+                form.notification.value,
             ];
-            var reminderDate = new Date(form.reminderDate.value);
+            var reminderDate = new Date(form.scheduleDate.value);
             var reminderDescription = form.reminderDescription.value;
             form.reset();
             return new Reminder(reminderDescription, reminderDate, reminderNotifications);
@@ -87,51 +86,52 @@
                 li.appendChild(textNode);
                 tasksList === null || tasksList === void 0 ? void 0 : tasksList.appendChild(li);
             });
-            var todoSet = document.getElementById('todoSet');
-            var reminderSet = document.getElementById('reminderSet');
-            if (mode === ViewMode.TODO) {
-                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute('style', 'display: block');
-                todoSet === null || todoSet === void 0 ? void 0 : todoSet.removeAttribute('disabled');
-                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute('style', 'display: none');
-                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute('disabled', 'true');
+            var todoSet = document.getElementById("todoSet");
+            var reminderSet = document.getElementById("reminderSet");
+            if (mode === Mode.TODO) {
+                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute("style", "display: block;");
+                todoSet === null || todoSet === void 0 ? void 0 : todoSet.removeAttribute("disabled");
+                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute("style", "display: none;");
+                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute("disabled", "true");
             }
             else {
-                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute('style', 'display: block');
-                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.removeAttribute('disabled');
-                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute('style', 'display: none');
-                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute('disabled', 'true');
+                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.setAttribute("style", "display: block;");
+                reminderSet === null || reminderSet === void 0 ? void 0 : reminderSet.removeAttribute("disabled");
+                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute("style", "display: none;");
+                todoSet === null || todoSet === void 0 ? void 0 : todoSet.setAttribute("disabled", "true");
             }
         },
     };
     var TaskController = function (view) {
         var _a, _b;
         var tasks = [];
-        var mode = ViewMode.TODO;
+        var mode = Mode.TODO;
         var handleTaskCreate = function (event) {
             event.preventDefault();
             var form = event.target;
             switch (mode) {
-                case ViewMode.TODO:
+                case Mode.TODO:
                     tasks.push(view.getTodo(form));
                     break;
-                case ViewMode.REMINDER:
+                case Mode.REMINDER:
                     tasks.push(view.getReminder(form));
                     break;
             }
             view.render(tasks, mode);
         };
-        var handleToggleMode = function () {
+        var handleModeToggle = function () {
             switch (mode) {
-                case ViewMode.TODO:
-                    mode = ViewMode.REMINDER;
+                case Mode.TODO:
+                    mode = Mode.REMINDER;
                     break;
-                case ViewMode.REMINDER:
-                    mode = ViewMode.TODO;
+                case Mode.REMINDER:
+                    mode = Mode.TODO;
                     break;
             }
             view.render(tasks, mode);
         };
-        (_a = document.getElementById('toggleMode')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', handleToggleMode);
+        (_a = document
+            .getElementById("toggleMode")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", handleModeToggle);
         (_b = document
             .getElementById("taskForm")) === null || _b === void 0 ? void 0 : _b.addEventListener("submit", handleTaskCreate);
     };
